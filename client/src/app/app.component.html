@@ -2,14 +2,14 @@
   <header class="hero">
     <div class="hero-text">
       <span class="pill">Local Ollama · llama3</span>
-      <h1>Atlas Chat Console</h1>
+      <h1>Atlas Talent Console</h1>
       <p>
-        A real-time chat UI powered by Angular on the front end and ASP.NET Core + Semantic Kernel
-        on the back end.
+        Chat with your local model or review CVs with an AI scorecard powered by ASP.NET Core,
+        Semantic Kernel, and Ollama.
       </p>
-      <div class="status" [class.busy]="isSending">
+      <div class="status" [class.busy]="isSending || cvIsChecking">
         <span class="status-dot"></span>
-        <span>{{ isSending ? 'Thinking...' : 'Ready' }}</span>
+        <span>{{ isSending || cvIsChecking ? 'Thinking...' : 'Ready' }}</span>
       </div>
     </div>
     <div class="config-card">
@@ -45,63 +45,150 @@
   </header>
 
   <main class="workspace">
-    <section class="chat-panel">
-      <div class="messages" #messagesContainer>
-        @for (message of messages; track $index) {
-          <div class="bubble" [class.user]="message.role === 'user'">
-            <div class="meta">{{ message.role === 'user' ? 'You' : 'Assistant' }}</div>
-            <div class="content">{{ message.content }}</div>
-          </div>
-        }
-        @if (errorMessage) {
-          <div class="bubble error">
-            <div class="meta">Error</div>
-            <div class="content">{{ errorMessage }}</div>
-          </div>
-        }
-        <div #scrollAnchor></div>
-      </div>
+    <div class="mode-toggle">
+      <button type="button" [class.active]="activePanel === 'chat'" (click)="activePanel = 'chat'">
+        Chat
+      </button>
+      <button type="button" [class.active]="activePanel === 'cv'" (click)="activePanel = 'cv'">
+        CV Check
+      </button>
+    </div>
 
-      <div class="composer">
-        <textarea
-          rows="3"
-          placeholder="Send a message..."
-          [(ngModel)]="message"
-          (keydown)="onComposerKeydown($event)"
-        ></textarea>
-        <button type="button" (click)="sendMessage()" [disabled]="isSending || !message.trim()">
-          {{ isSending ? 'Sending...' : 'Send' }}
-        </button>
-      </div>
-    </section>
+    @if (activePanel === 'chat') {
+      <section class="chat-panel">
+        <div class="messages" #messagesContainer>
+          @for (message of messages; track $index) {
+            <div class="bubble" [class.user]="message.role === 'user'">
+              <div class="meta">{{ message.role === 'user' ? 'You' : 'Assistant' }}</div>
+              <div class="content">{{ message.content }}</div>
+            </div>
+          }
+          @if (errorMessage) {
+            <div class="bubble error">
+              <div class="meta">Error</div>
+              <div class="content">{{ errorMessage }}</div>
+            </div>
+          }
+          <div #scrollAnchor></div>
+        </div>
 
-    <aside class="prompt-panel">
-      <h2>Prompt starters</h2>
-      <p>Jumpstart a conversation with a single tap.</p>
-      <div class="prompt-list">
-        <button type="button" (click)="usePrompt('Summarize the key benefits of local LLMs.')">
-          Summarize the key benefits of local LLMs.
-        </button>
-        <button type="button" (click)="usePrompt('Draft a concise release note for this app.')">
-          Draft a concise release note for this app.
-        </button>
-        <button type="button" (click)="usePrompt('Write a SQL query to list the top 5 customers by revenue.')">
-          Write a SQL query to list the top 5 customers by revenue.
-        </button>
-        <button type="button" (click)="usePrompt('Explain semantic kernel plugins in plain language.')">
-          Explain semantic kernel plugins in plain language.
-        </button>
-      </div>
-      <div class="legend">
-        <div>
-          <span class="legend-dot user"></span>
-          <span>User</span>
+        <div class="composer">
+          <textarea
+            rows="3"
+            placeholder="Send a message..."
+            [(ngModel)]="message"
+            (keydown)="onComposerKeydown($event)"
+          ></textarea>
+          <button type="button" (click)="sendMessage()" [disabled]="isSending || !message.trim()">
+            {{ isSending ? 'Sending...' : 'Send' }}
+          </button>
         </div>
-        <div>
-          <span class="legend-dot assistant"></span>
-          <span>Assistant</span>
+      </section>
+
+      <aside class="prompt-panel">
+        <h2>Prompt starters</h2>
+        <p>Jumpstart a conversation with a single tap.</p>
+        <div class="prompt-list">
+          <button type="button" (click)="usePrompt('Summarize the key benefits of local LLMs.')">
+            Summarize the key benefits of local LLMs.
+          </button>
+          <button type="button" (click)="usePrompt('Draft a concise release note for this app.')">
+            Draft a concise release note for this app.
+          </button>
+          <button type="button" (click)="usePrompt('Write a SQL query to list the top 5 customers by revenue.')">
+            Write a SQL query to list the top 5 customers by revenue.
+          </button>
+          <button type="button" (click)="usePrompt('Explain semantic kernel plugins in plain language.')">
+            Explain semantic kernel plugins in plain language.
+          </button>
         </div>
-      </div>
-    </aside>
+        <div class="legend">
+          <div>
+            <span class="legend-dot user"></span>
+            <span>User</span>
+          </div>
+          <div>
+            <span class="legend-dot assistant"></span>
+            <span>Assistant</span>
+          </div>
+        </div>
+      </aside>
+    } @else {
+      <section class="cv-panel">
+        <div class="cv-form">
+          <div class="cv-header">
+            <span class="eyebrow">Resume intelligence</span>
+            <h2>CV checker</h2>
+            <p>Upload a PDF/DOCX or paste your resume content. We will return a summary, score, and suggestions.</p>
+            <div class="rubric">
+              <span>ATS fit</span>
+              <span>Grammar</span>
+              <span>Role alignment</span>
+            </div>
+          </div>
+          <label class="field">
+            <span>Paste resume text</span>
+            <textarea rows="8" placeholder="Paste your resume content here..." [(ngModel)]="cvText"></textarea>
+          </label>
+          <label class="field upload">
+            <span>Upload resume file</span>
+            <input type="file" accept=".pdf,.docx" (change)="onCvFileSelected($event)" />
+            <div class="file-meta" *ngIf="cvFileName">Selected: {{ cvFileName }}</div>
+          </label>
+          <div class="cv-divider">
+            <span>or</span>
+          </div>
+          <div class="cv-actions">
+            <button type="button" class="secondary" (click)="clearCv()" [disabled]="cvIsChecking">
+              Clear
+            </button>
+            <button type="button" (click)="checkCv()" [disabled]="cvIsChecking">
+              {{ cvIsChecking ? 'Checking...' : 'Check CV' }}
+            </button>
+          </div>
+          <p class="hint">The AI uses a balanced rubric (ATS, grammar, and role fit).</p>
+        </div>
+      </section>
+
+      <aside class="cv-results">
+        <div class="score-card">
+          <div class="score-label">Score</div>
+          <div class="score-value">{{ cvResult?.score ?? 0 }}</div>
+          <div class="score-bar">
+            <div class="score-fill" [style.width.%]="cvResult?.score ?? 0"></div>
+          </div>
+          <div class="score-caption">Benchmarked against a balanced rubric.</div>
+        </div>
+        <div class="summary-card">
+          <h3>Summary</h3>
+          <p *ngIf="cvResult?.summary; else emptySummary">{{ cvResult?.summary }}</p>
+          <ng-template #emptySummary>
+            <p class="muted">Upload your CV to see the summary.</p>
+          </ng-template>
+        </div>
+        <div class="suggestions-card">
+          <h3>Suggestions</h3>
+          <ul *ngIf="cvResult?.suggestions?.length; else emptySuggestions">
+            @for (suggestion of cvResult?.suggestions ?? []; track $index) {
+              <li>{{ suggestion }}</li>
+            }
+          </ul>
+          <ng-template #emptySuggestions>
+            <p class="muted">Suggestions will appear here after analysis.</p>
+          </ng-template>
+        </div>
+        <div class="json-card">
+          <h3>Raw JSON</h3>
+          <pre *ngIf="cvResult; else emptyJson">{{ cvResult | json }}</pre>
+          <ng-template #emptyJson>
+            <p class="muted">JSON output will appear here after analysis.</p>
+          </ng-template>
+        </div>
+        <div class="error-card" *ngIf="cvError">
+          <h3>Issue</h3>
+          <p>{{ cvError }}</p>
+        </div>
+      </aside>
+    }
   </main>
 </div>

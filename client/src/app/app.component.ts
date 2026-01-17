@@ -17,11 +17,19 @@ export class AppComponent implements AfterViewChecked {
 
   apiBaseUrl = localStorage.getItem(AppComponent.storageKey) ?? 'http://127.0.0.1:5050';
   useStreaming = true;
+  activePanel: 'chat' | 'cv' = 'chat';
   message = '';
   temperature = 0.7;
   maxTokens = 256;
   isSending = false;
   errorMessage = '';
+
+  cvText = '';
+  cvFile: File | null = null;
+  cvFileName = '';
+  cvIsChecking = false;
+  cvError = '';
+  cvResult: CvReview | null = null;
 
   messages: ChatMessage[] = [
     { role: 'assistant', content: 'Hi, I am your local Ollama assistant. Ask me anything.' }
@@ -104,6 +112,67 @@ export class AppComponent implements AfterViewChecked {
       event.preventDefault();
       this.sendMessage();
     }
+  }
+
+  onCvFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    this.cvFile = file;
+    this.cvFileName = file ? file.name : '';
+  }
+
+  clearCv(): void {
+    this.cvText = '';
+    this.cvFile = null;
+    this.cvFileName = '';
+    this.cvResult = null;
+    this.cvError = '';
+  }
+
+  checkCv(): void {
+    if (this.cvIsChecking) {
+      return;
+    }
+
+    const hasText = this.cvText.trim().length > 0;
+    const hasFile = !!this.cvFile;
+    if (!hasText && !hasFile) {
+      this.cvError = 'Please paste resume text or upload a PDF/DOCX file.';
+      return;
+    }
+
+    this.cvError = '';
+    this.cvIsChecking = true;
+    this.cvResult = null;
+
+    const formData = new FormData();
+    if (hasText) {
+      formData.append('text', this.cvText.trim());
+    }
+    if (this.cvFile) {
+      formData.append('file', this.cvFile);
+    }
+
+    const baseUrl = this.apiBaseUrl.trim();
+    const url = baseUrl ? `${baseUrl}/api/cv/check` : '/api/cv/check';
+
+    this.http.post<CvReview>(url, formData).subscribe({
+      next: (result) => {
+        this.cvResult = {
+          summary: result.summary,
+          score: Math.max(0, Math.min(100, result.score)),
+          suggestions: result.suggestions ?? []
+        };
+        this.cvIsChecking = false;
+      },
+      error: (error) => {
+        this.cvIsChecking = false;
+        this.cvError =
+          error?.error?.error ??
+          error?.message ??
+          'Unable to reach the backend. Check the API base URL and that the server is running.';
+      }
+    });
   }
 
   private async sendStreamingMessage(url: string, payload: ChatRequest): Promise<void> {
@@ -218,4 +287,10 @@ interface ChatMessage {
 interface StreamPayload {
   delta?: string;
   done?: boolean;
+}
+
+interface CvReview {
+  summary: string;
+  score: number;
+  suggestions: string[];
 }
