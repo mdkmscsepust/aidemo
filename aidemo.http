@@ -1,6 +1,0 @@
-@aidemo_HostAddress = http://localhost:0
-
-GET {{aidemo_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

@@ -1,0 +1,107 @@
+<div class="app-shell">
+  <header class="hero">
+    <div class="hero-text">
+      <span class="pill">Local Ollama · llama3</span>
+      <h1>Atlas Chat Console</h1>
+      <p>
+        A real-time chat UI powered by Angular on the front end and ASP.NET Core + Semantic Kernel
+        on the back end.
+      </p>
+      <div class="status" [class.busy]="isSending">
+        <span class="status-dot"></span>
+        <span>{{ isSending ? 'Thinking...' : 'Ready' }}</span>
+      </div>
+    </div>
+    <div class="config-card">
+      <label class="field">
+        <span>API base URL</span>
+        <input
+          type="text"
+          placeholder="http://127.0.0.1:5050"
+          [(ngModel)]="apiBaseUrl"
+          (blur)="persistApiBaseUrl()"
+        />
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span>Temperature</span>
+          <input type="range" min="0" max="1" step="0.05" [(ngModel)]="temperature" />
+        </label>
+        <div class="value-pill">{{ temperature.toFixed(2) }}</div>
+      </div>
+      <div class="field-row">
+        <label class="field">
+          <span>Max tokens</span>
+          <input type="number" min="32" max="2048" step="32" [(ngModel)]="maxTokens" />
+        </label>
+        <div class="value-pill">{{ maxTokens }}</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" [(ngModel)]="useStreaming" />
+        <span>Stream responses live</span>
+      </label>
+      <p class="hint">Tip: leave the base URL blank to use a same-origin proxy.</p>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="chat-panel">
+      <div class="messages" #messagesContainer>
+        @for (message of messages; track $index) {
+          <div class="bubble" [class.user]="message.role === 'user'">
+            <div class="meta">{{ message.role === 'user' ? 'You' : 'Assistant' }}</div>
+            <div class="content">{{ message.content }}</div>
+          </div>
+        }
+        @if (errorMessage) {
+          <div class="bubble error">
+            <div class="meta">Error</div>
+            <div class="content">{{ errorMessage }}</div>
+          </div>
+        }
+        <div #scrollAnchor></div>
+      </div>
+
+      <div class="composer">
+        <textarea
+          rows="3"
+          placeholder="Send a message..."
+          [(ngModel)]="message"
+          (keydown)="onComposerKeydown($event)"
+        ></textarea>
+        <button type="button" (click)="sendMessage()" [disabled]="isSending || !message.trim()">
+          {{ isSending ? 'Sending...' : 'Send' }}
+        </button>
+      </div>
+    </section>
+
+    <aside class="prompt-panel">
+      <h2>Prompt starters</h2>
+      <p>Jumpstart a conversation with a single tap.</p>
+      <div class="prompt-list">
+        <button type="button" (click)="usePrompt('Summarize the key benefits of local LLMs.')">
+          Summarize the key benefits of local LLMs.
+        </button>
+        <button type="button" (click)="usePrompt('Draft a concise release note for this app.')">
+          Draft a concise release note for this app.
+        </button>
+        <button type="button" (click)="usePrompt('Write a SQL query to list the top 5 customers by revenue.')">
+          Write a SQL query to list the top 5 customers by revenue.
+        </button>
+        <button type="button" (click)="usePrompt('Explain semantic kernel plugins in plain language.')">
+          Explain semantic kernel plugins in plain language.
+        </button>
+      </div>
+      <div class="legend">
+        <div>
+          <span class="legend-dot user"></span>
+          <span>User</span>
+        </div>
+        <div>
+          <span class="legend-dot assistant"></span>
+          <span>Assistant</span>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>
