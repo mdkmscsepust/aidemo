@@ -1,5 +1,5 @@
 <Solution>
   <Folder Name="/backend/">
-    <Project Path="backend/Backend.csproj" />
+    <Project Path="backend/backend.API/backend.API.csproj" />
   </Folder>
 </Solution>

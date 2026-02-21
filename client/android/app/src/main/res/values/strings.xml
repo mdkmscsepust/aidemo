@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ReserveIt</string>
+    <string name="title_activity_main">ReserveIt</string>
+    <string name="package_name">com.reserveit.app</string>
+    <string name="custom_url_scheme">com.reserveit.app</string>
+</resources>

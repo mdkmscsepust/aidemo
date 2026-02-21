@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80" fill="none">
+
+  <!-- ════════════════════════════════
+       WINE GLASS + VINE  (icon region: x=4..62, y=4..76)
+       Center of glass: cx=36
+       ════════════════════════════════ -->
+  <g>
+
+    <!-- Glass body: bowl widens at rim, thin stem, flat wide base -->
+    <path d="
+      M 16 5 L 56 5
+      C 60 18 57 38 39 54
+      L 39 66
+      C 39 69 50 70 50 72
+      L 22 72
+      C 22 70 33 69 33 66
+      L 33 54
+      C 15 38 12 18 16 5
+      Z
+    " fill="#8B1A2E"/>
+
+    <!-- Gold vine: grows from left side of stem junction,
+         curls up and outward to the LEFT of the glass -->
+    <!-- Main tendril -->
+    <path d="M 33 55
+             C 24 51 16 44 19 35
+             C 22 27 15 19 18 12"
+      stroke="#8A7530" stroke-width="2.2"
+      stroke-linecap="round" fill="none"/>
+
+    <!-- Small secondary curl from vine tip -->
+    <path d="M 18 12 C 15 6 20 3 21 9"
+      stroke="#8A7530" stroke-width="1.3"
+      stroke-linecap="round" fill="none"/>
+
+    <!-- Left lobe of leaf at vine top -->
+    <path d="M 18 12
+             C 9 7 6 18 13 18
+             C 16 18 18 12 18 12 Z"
+      fill="#8A7530"/>
+
+    <!-- Upper lobe of leaf -->
+    <path d="M 18 12
+             C 15 4 23 3 22 10
+             C 21 14 18 12 18 12 Z"
+      fill="#8A7530"/>
+
+    <!-- Small gold dot at vine root -->
+    <circle cx="33" cy="55" r="1.5" fill="#8A7530"/>
+
+  </g>
+
+  <!-- ════════════════════════════════
+       WORDMARK  "TableVine"
+       x=68 places it clear of the glass+vine
+       ════════════════════════════════ -->
+  <text x="68" y="50"
+    font-family="'Playfair Display', Georgia, 'Times New Roman', serif"
+    font-size="32" font-weight="400">
+    <tspan fill="#8B1A2E" letter-spacing="-0.2">Table</tspan><tspan
+      fill="#8A7530" letter-spacing="-0.2">Vine</tspan>
+  </text>
+
+  <!-- Hairline rule beneath wordmark -->
+  <line x1="68" y1="57" x2="292" y2="57"
+    stroke="#8A7530" stroke-width="0.6" opacity="0.4"/>
+
+  <!-- Micro tagline -->
+  <text x="68" y="69"
+    font-family="'DM Sans', 'Helvetica Neue', Arial, sans-serif"
+    font-size="8.5" fill="#8A847C" letter-spacing="0.22em"
+    font-weight="400">RESERVE YOUR EVENING</text>
+
+</svg>

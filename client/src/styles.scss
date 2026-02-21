@@ -1,0 +1,106 @@
+@use '@angular/material' as mat;
+
+// ─── Custom wine palette (primary) ───────────────────────────────────────────
+$wine-palette: (
+  50:  #fce4e8,  100: #f9bac3,  200: #f28c9b,  300: #ec5e72,
+  400: #e53b53,  500: #8B1A2E,  600: #7A1628,  700: #681320,
+  800: #5C1019,  900: #46090F,
+  A100: #ffa3ae, A200: #ff7082, A400: #ff3d55, A700: #ff2440,
+  contrast: (
+    50:rgba(0,0,0,.87),  100:rgba(0,0,0,.87), 200:rgba(0,0,0,.87),
+    300:rgba(0,0,0,.87), 400:rgba(0,0,0,.87), 500:white,
+    600:white, 700:white, 800:white, 900:white,
+    A100:rgba(0,0,0,.87), A200:rgba(0,0,0,.87), A400:white, A700:white
+  )
+);
+
+// ─── Custom gold palette (accent) ────────────────────────────────────────────
+$gold-palette: (
+  50:  #fdf8ec,  100: #faedcd,  200: #f6e1ac,  300: #f2d58b,
+  400: #efcc71,  500: #C9973A,  600: #b88932,  700: #a47829,
+  800: #916820,  900: #6e4d14,
+  A100: #fff6e0, A200: #ffecb0, A400: #ffe280, A700: #ffdd67,
+  contrast: (
+    50:rgba(0,0,0,.87),  100:rgba(0,0,0,.87), 200:rgba(0,0,0,.87),
+    300:rgba(0,0,0,.87), 400:rgba(0,0,0,.87), 500:rgba(0,0,0,.87),
+    600:rgba(0,0,0,.87), 700:rgba(0,0,0,.87), 800:rgba(0,0,0,.87),
+    900:rgba(0,0,0,.87), A100:rgba(0,0,0,.87), A200:rgba(0,0,0,.87),
+    A400:rgba(0,0,0,.87), A700:rgba(0,0,0,.87)
+  )
+);
+
+$primary: mat.m2-define-palette($wine-palette, 500);
+$accent:  mat.m2-define-palette($gold-palette, 500);
+$warn:    mat.m2-define-palette(mat.$m2-red-palette);
+
+$theme: mat.m2-define-light-theme((
+  color: (primary: $primary, accent: $accent, warn: $warn),
+  typography: mat.m2-define-typography-config(
+    $font-family: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif"
+  )
+));
+
+@include mat.all-component-themes($theme);
+
+// ─── Design tokens ────────────────────────────────────────────────────────────
+:root {
+  --cream:      #FAF7F2;
+  --ink:        #1A1410;
+  --wine:       #8B1A2E;
+  --wine-light: #B5253F;
+  --gold:       #C9973A;
+  --gold-light: #E8C060;
+  --warm-gray:  #8A847C;
+  --border:     #E8E0D5;
+  --card-bg:    #FFFFFF;
+  --shadow-sm:  0 2px 12px rgba(26,20,16,.06);
+  --shadow:     0 4px 32px rgba(26,20,16,.08);
+  --shadow-lg:  0 12px 48px rgba(26,20,16,.12);
+  --radius:     12px;
+}
+
+// ─── Global resets ────────────────────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  background: var(--cream);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--wine); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.app-shell { display: flex; flex-direction: column; min-height: 100vh; }
+.main-content { flex: 1; }
+
+// ─── Material component overrides ─────────────────────────────────────────────
+// Cards: cream-compatible
+.mat-mdc-card {
+  border-radius: var(--radius) !important;
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+// Form field: wine focus color
+.mat-mdc-form-field.mat-focused .mat-mdc-floating-label { color: var(--wine) !important; }
+.mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused {
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing { border-color: var(--wine) !important; }
+}
+
+// Paginator
+.mat-mdc-paginator { background: transparent !important; }
+
+// Snackbar
+.mat-mdc-snack-bar-container { --mdc-snackbar-container-color: var(--ink); }
+
+// Dialog
+.mat-mdc-dialog-surface { border-radius: var(--radius) !important; }
